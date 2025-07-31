@@ -40,15 +40,17 @@ jobs:
     
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-    - name: Print current directory
-      run: pwd
-    - name: Print current directory and contents
-      run: |
-        pwd
-        ls -al
+      
     - name: Run tests
       run: mvn -B test --file pom.xml
       working-directory: ${{ inputs.working-directory }}
+
+    - name: List report files
+      run: ls -R ${{ inputs.working-directory }}/target/
+    
+    - name: List test report directory
+      run: ls -al ${{ inputs.working-directory }}/target/surefire-reports || echo "No test report directory"
+
 
     - name: Upload test reports
       if: always()  # ensures it runs even if tests fail
@@ -56,14 +58,14 @@ jobs:
       with:
         name: surefire-reports
         path: ${{ inputs.working-directory }}/target/surefire-reports/
-        
-    - name: Print working-directory from input
+   
+    - name: Print current directory
+      run: pwd
+    - name: Print current directory and contents
       run: |
-        echo "Working directory is: ${{ inputs.working-directory }}"
-        cd ${{ inputs.working-directory }}
         pwd
         ls -al
-   
+        
   publish-job:
     runs-on: ubuntu-latest
     needs: build_test
