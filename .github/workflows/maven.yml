@@ -44,9 +44,6 @@ jobs:
     - name: Run tests
       run: mvn -B test --file pom.xml
       working-directory: ${{ inputs.working-directory }}
-
-    - name: List report files
-      run: ls -R ${{ inputs.working-directory }}/target/
     
     - name: List test report directory
       run: ls -al ${{ inputs.working-directory }}/target/surefire-reports || echo "No test report directory"
