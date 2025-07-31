@@ -7,6 +7,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+    
   workflow_call:
     inputs:
       working-directory:
@@ -20,7 +21,10 @@ jobs:
   build_test:
 
     runs-on: ubuntu-latest
-
+    
+    outputs:
+      commit-id: ${{ steps.get_commit.outputs.commit_id }}
+      
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -29,6 +33,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+    
+    - name: Get Git commit ID
+      id: get_commit
+      run: echo "commit_id=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+    
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: Print current directory
@@ -43,6 +52,16 @@ jobs:
         cd ${{ inputs.working-directory }}
         pwd
         ls -al
+    - name: Run tests
+      run: mvn -B test --file pom.xml
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Upload test reports
+      if: always()  # ensures it runs even if tests fail
+      uses: actions/upload-artifact@v4
+      with:
+        name: surefire-reports
+        path: ${{ inputs.working-directory }}/target/surefire-reports/
    
   publish-job:
     runs-on: ubuntu-latest
