@@ -46,12 +46,6 @@ jobs:
       run: |
         pwd
         ls -al
-    - name: Print working-directory from input
-      run: |
-        echo "Working directory is: ${{ inputs.working-directory }}"
-        cd ${{ inputs.working-directory }}
-        pwd
-        ls -al
     - name: Run tests
       run: mvn -B test --file pom.xml
       working-directory: ${{ inputs.working-directory }}
@@ -62,6 +56,13 @@ jobs:
       with:
         name: surefire-reports
         path: ${{ inputs.working-directory }}/target/surefire-reports/
+        
+    - name: Print working-directory from input
+      run: |
+        echo "Working directory is: ${{ inputs.working-directory }}"
+        cd ${{ inputs.working-directory }}
+        pwd
+        ls -al
    
   publish-job:
     runs-on: ubuntu-latest
